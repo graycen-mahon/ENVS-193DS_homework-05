@@ -112,3 +112,68 @@ check_normality(full_log)
 check_heteroscedasticity(full_log)
 ```
 
+```{r}
+# null_log <- ???
+```
+
+
+Evaluate multicollinearity:
+
+```{r calculate-vif}
+car::vif(full_log)
+```
+
+We evaluated multicollinearity by calculating generalized variance inflation factor and determined that...
+
+Try some more models:
+
+addressing the question: what set of predictor variables best explains the response?
+
+```{r}
+model2_log <- lm(log(totmass) ~ species, data = plant_subset)
+```
+
+check assumptions for model 2:
+```{r}
+plot(model2_log)
+# they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
+
+check_normality(model2_log)
+check_heteroscedasticity(model2_log)
+```
+
+compare models. using Akaike's information criterion (AIC) values
+
+```{r}
+AICc(full_log)
+AICc(model2_log)
+# AICc(null_log) 
+
+MuMIn::AICc(full_log, model2_log)
+MuMIn::model.sel(full_log, model2_log)
+```
+
+based on the AICc values, the full model has the loswet value and therefore is the best predictor of...
+
+# Results
+
+We found that the _____ model including ____ ___ ___ predictors best predicted _____ (model summary).
+
+```{r}
+summary(full_log)
+```
+
+use gg predict to back transform estimates
+
+```{r}
+model_pred <- ggpredict(full_log, terms = "species", back.transform = TRUE)
+
+plot(ggpredict(full_log, terms = "species", back.transform = TRUE), add.data = TRUE)
+
+plot(ggpredict(full_log, terms = "chlorophyll", back.transform = TRUE), add.data = TRUE)
+
+plot(ggpredict(full_log, terms = "sla", back.transform = TRUE), add.data = TRUE)
+
+model_pred
+```
+
