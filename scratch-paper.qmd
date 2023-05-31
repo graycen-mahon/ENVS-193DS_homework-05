@@ -105,15 +105,12 @@ check_heteroscedasticity(full)
 ```
 
 ```{r}
+null_log <- lm(log(totmass) ~ 1, data = plant_subset)
 full_log <- lm(log(totmass) ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
 
 plot(full_log)
 check_normality(full_log)
 check_heteroscedasticity(full_log)
-```
-
-```{r}
-# null_log <- ???
 ```
 
 
@@ -147,10 +144,10 @@ compare models. using Akaike's information criterion (AIC) values
 ```{r}
 AICc(full_log)
 AICc(model2_log)
-# AICc(null_log) 
+AICc(null_log) 
 
-MuMIn::AICc(full_log, model2_log)
-MuMIn::model.sel(full_log, model2_log)
+MuMIn::AICc(full_log, model2_log, null_log)
+MuMIn::model.sel(full_log, model2_log, null_log)
 ```
 
 based on the AICc values, the full model has the loswet value and therefore is the best predictor of...
@@ -161,6 +158,17 @@ We found that the _____ model including ____ ___ ___ predictors best predicted _
 
 ```{r}
 summary(full_log)
+
+tables <- tidy(full_log, conf.int = TRUE) %>% 
+  # change the p value numbers if they are really small
+  # change the estimates, standard error and t-statistics to round to ___ numbers
+  # using mutate
+  # make into a flex table
+  flextable() %>% 
+  # fit into  the viewer
+  autofit()
+
+table
 ```
 
 use gg predict to back transform estimates
@@ -175,5 +183,11 @@ plot(ggpredict(full_log, terms = "chlorophyll", back.transform = TRUE), add.data
 plot(ggpredict(full_log, terms = "sla", back.transform = TRUE), add.data = TRUE)
 
 model_pred
+```
+
+# Differemt types of anovas
+
+```{r}
+
 ```
 
