@@ -1,0 +1,52 @@
+---
+title: "homework-05"
+author: "Graycen Mahon"
+format: html
+editor: visual
+---
+
+## knitr set up options for an RMarkdown document:
+
+```{r knitr-example, eval = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Organize Packages using the here package
+
+```{r file-organization}
+here("Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05")
+```
+
+# Set up
+
+```{r packages!}
+# should haves (from last week)
+library(tidyverse)
+library(here)
+library(janitor)
+library(ggeffects)
+library(performance)
+library(naniar) # or equivalent
+library(flextable) # or equivalent
+library(car)
+library(broom)
+# would be nice to have
+library(corrplot)
+library(AICcmodavg)
+library(GGally)
+```
+
+## Introduction
+
+
+
+## Reading in the dataset:
+
+```{r reading-in-data}
+plant_data <- read_csv("hf109-01-sarracenia.csv") %>% 
+  # using the function clean names, you can alter the format of the column names and use an underscore rather than a period
+clean_names() %>% 
+# then, using the select function, you can choose the variables we are interested in
+select(totmass, species, feedlevel, sla, chlorophyll, amass, num_lvs, num_phylls)
+```
+
