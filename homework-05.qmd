@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 # Organize Packages using the here package
 
 ```{r file-organization}
-here("Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05")
+here::here("Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05")
 ```
 
 # Set up
@@ -38,15 +38,127 @@ library(GGally)
 
 ## Introduction
 
+  Also known as pitcher plant, the Sarracenia is a carnivorous plant found in the eastern United States and Canada (Bledzki et al). It has pitcher-like leaves filled with a toxic and corrosive liquid (Bledzki et al). This liquid is what breaks down and allows the plant to consume its prey!According to a study published in the National center for Biotechnology Information, the Sarracenia plant has many ethnobotanical uses such as: treating type II diabetes and tuberculosis (Huang et al). Studies also show this species as a potential treatment for cancer (Huang et al). The current and theorized uses of this plant could be groundbreaking, and therefore have sparked the interest of many scientists and botanists. Furthermore, predicting the biomass through physiological methods (the mass of the fluid in the Sarracenia leaves) is useful in assessing it's potential for prey consumption as well as observing the targeted prey of the species (Bledzki et a). Ecological studies of this species can show population dynamics of common organisms that are prey of the Sarracenia plant and how it affects the environment (Bledzki et al). In this analysis, I am addressing the following question: How do Sarracenia characteristics predict biomass? In order to answer this question, I will test the hypothesis that different Sarracenia characteristics (such as feed level, chlorophyll content, photosynthetic rate, number of leaves as the number of predatory phyllodes) have a positive affect on the plants biomass. Through this analysis of the data, I will either accept or reject this hypothesis and it will be shown through my work. 
+  For this study, the data was sampled by selected two plants of each of the Sarracenia species and they were then assigned to a specific "feeding level", ranked 1-6. The rankings coincided with the size of the plants, and were therefore given different amounts of feed. Over 7 weeks (on a once a week feeding schedule) the plants were measured for their size as well as photosynthetic rate both prior to and during the treatment. 
+  
+Sources:
+
+Bledzki, Leszek A. et al. "Population Growth and Production.." Department of Biological Sciences, Mount Holyoke College, 1998 https://link-springer-com.proxy.library.ucsb.edu/content/pdf/10.1023/A%3A1003566729588.pdf 
+
+Ellison, A. and E. Farnsworth. 2021. Effects of Prey Availability on Sarracenia Physiology at Harvard Forest 2005 ver 18. Environmental Data Initiative. https://doi.org/10.6073/pasta/26b22d09279e62fd729ffc35f9ef0174 (Accessed 2023-06-02).
+
+Huang, Yen-Hua et al. "Anticancer and Antioxidant Activities...", National Center for Biotechnology Information, National Library of Medicine, 2022
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9269354/ 
+
+
+## Methods:
+
+  In order to organize the data, it first must be read into R studio using the read_csv function. I created a new object called "plant"and stored the data set within this object. After reading in the data, I used the clean_names and select functions in order to make the column titles easier to read & work with in R and reduced the numbers of variables shown in the data set with only the characteristics I am interested in remaining. Afterwards, I created a missing data visualization using the data frame "plant" in order to show the missing data points for each characteristic in question. This shows that out of the 120 observations of Sarracenia plants, there is about 10% of missing data (each) for Chlorophyll content, Photosynthetic rate, and leaf area. Missing data can skew the analysis of a data set, and therefore should be accounted for when looking at and running tests on a data frame. After creating the missing data visualization in order to determine the relationships between numerical variables in our data set, we calculated Pearson r and visually represented correlation using a correlation plot. The plot shows the correlation between different variables, with +1 showing a positive correlation and -1 showing a negative correlation (while 0 is no correlation). 
 
 
 ## Reading in the dataset:
 
 ```{r reading-in-data}
-plant_data <- read_csv("hf109-01-sarracenia.csv") %>% 
+plant <- read_csv("hf109-01-sarracenia.csv") %>% 
   # using the function clean names, you can alter the format of the column names and use an underscore rather than a period
 clean_names() %>% 
 # then, using the select function, you can choose the variables we are interested in
 select(totmass, species, feedlevel, sla, chlorophyll, amass, num_lvs, num_phylls)
 ```
 
+# Visualize the missing data:
+
+```{r missing-data-visualization}
+gg_miss_var(plant) + labs(caption = "This plot shows the missing data points for the variabales in question in the plant data frame. Chlorophyll content, photosynthetic rate, and Spcific Leaf Area are missing the most data points (about 10-15) while there is little to none missing for the other Sarracenia characteristics observed for the study.")
+```
+
+# Creating a Subset of the dataframe and omitting the NA (missing data values)
+
+```{r subset-drop-NA}
+plant_subset <- plant %>% 
+  drop_na(sla, chlorophyll, amass, num_lvs, num_phylls)
+```
+
+# Create a correlation plot:  
+
+```{r correlation-plot}
+# calculate Pearson's r for numerical values only
+plant_cor <- plant_subset %>% 
+  select(feedlevel:num_phylls) %>% 
+  cor(method = "pearson")
+  
+# creating a correlation plot
+corrplot(plant_cor,
+         # change the shape of what's in the cells
+         method = "ellipse",
+         addCoef.col = "black")
+  title(sub = "This correlation plot shows that there is a fairly even ditribution of both poswitive and negative linear correlations between the variables in the data subset. The red ovals shows a negative value, meaning there is a negative correlation between the variables in the column & row while the blue ovals are a positive correlation. Diagonally you can see boxes with +1 and a line drawn through them, this is because it is the comparison of the same variables. Boxes with a 0 are variables with no correlation at all.")
+```
+
+# Create a plot of each variable compared against the others 
+
+```{r pairs-plot}
+plant_subset %>% 
+  select(species:num_phylls) %>% 
+  ggpairs()
+```
+
+# Starting regression here:  
+
+(example) To determine how species and physiological characteristics predict biomass, we fit multiple linear models.
+
+```{r null-and-full-models}
+null <- lm(totmass ~ 1, data = plant_subset)
+full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
+```
+
+# Diagnostics
+
+We visually assess normality and homoskedasticity of residuals using diagnostic plots for the full model:
+
+```{r full-diagnostics}
+par(mfrow = c(2, 2))
+plot(full)
+```
+
+We also tested for normality using the Shapiro-Wilk test (null hypothesis: variable of interest (i.e. the residuals) are normally distributed).  
+
+We tested for heteroskedasticity using the Breusch-Pagan test (null hypothesis: variable of interest has constant variance).
+```{r}
+check_normality(full)
+check_heteroscedasticity(full)
+```
+
+```{r}
+null_log <- lm(log(totmass) ~ 1, data = plant_subset)
+full_log <- lm(log(totmass) ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
+
+plot(full_log)
+check_normality(full_log)
+check_heteroscedasticity(full_log)
+```
+
+Evaluate multicollinearity:
+
+```{r calculate-vif}
+car::vif(full_log)
+```
+
+We evaluated multicollinearity by calculating generalized variance inflation factor and determined that...
+
+Try some more models:
+
+addressing the question: what set of predictor variables best explains the response?
+
+```{r}
+model2_log <- lm(log(totmass) ~ species, data = plant_subset)
+```
+
+check assumptions for model 2:
+```{r}
+plot(model2_log)
+# they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
+
+check_normality(model2_log)
+check_heteroscedasticity(model2_log)
+```
