@@ -11,13 +11,13 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
-# Organize Packages using the here package
+## Organize Packages using the here package
 
 ```{r file-organization}
 here::here("Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05")
 ```
 
-# Set up
+## Set up
 
 ```{r packages!}
 # should haves (from last week)
@@ -53,7 +53,7 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9269354/
 
 ## Methods:
 
-  In order to organize the data, it first must be read into R studio using the read_csv function. I created a new object called "plant"and stored the data set within this object. After reading in the data, I used the clean_names and select functions in order to make the column titles easier to read & work with in R and reduced the numbers of variables shown in the data set with only the characteristics I am interested in remaining. Afterwards, I created a missing data visualization using the data frame "plant" in order to show the missing data points for each characteristic in question. This shows that out of the 120 observations of Sarracenia plants, there is about 10% of missing data (each) for Chlorophyll content, Photosynthetic rate, and leaf area. Missing data can skew the analysis of a data set, and therefore should be accounted for when looking at and running tests on a data frame. After creating the missing data visualization in order to determine the relationships between numerical variables in our data set, we calculated Pearson r and visually represented correlation using a correlation plot. The plot shows the correlation between different variables, with +1 showing a positive correlation and -1 showing a negative correlation (while 0 is no correlation). 
+  In order to organize the data, it first must be read into R studio using the read_csv function. I created a new object called "plant"and stored the data set within this object. After reading in the data, I used the clean_names and select functions in order to make the column titles easier to read & work with in R and reduced the numbers of variables shown in the data set with only the characteristics I am interested in remaining. Afterwards, I created a missing data visualization using the data frame "plant" in order to show the missing data points for each characteristic in question. This shows that out of the 120 observations of Sarracenia plants, there is about 10% of missing data (each) for Chlorophyll content, Photosynthetic rate, and leaf area. Missing data can skew the analysis of a data set, and therefore should be accounted for when looking at and running tests on a data frame. After creating the missing data visualization in order to determine the relationships between numerical variables in our data set, we calculated Pearson r and visually represented correlation using a correlation plot. The plot shows the correlation between different variables, with +1 showing a positive correlation and -1 showing a negative correlation (while 0 is no correlation). In the visualization showing the relationships between the two variables, each graph is plotting different variables against one another. The linear plots down the diagonal show the density relationship for each variable, while the plots on the top row and the leftmost row are plots of each variable with species. The squares above the diagonal are the Pearson correlation values while the plots below the diagonal are scatter plots of a pair of variables compared to one another. 
 
 
 ## Reading in the dataset:
@@ -66,20 +66,20 @@ clean_names() %>%
 select(totmass, species, feedlevel, sla, chlorophyll, amass, num_lvs, num_phylls)
 ```
 
-# Visualize the missing data:
+## Visualize the missing data:
 
 ```{r missing-data-visualization}
-gg_miss_var(plant) + labs(caption = "This plot shows the missing data points for the variabales in question in the plant data frame. Chlorophyll content, photosynthetic rate, and Spcific Leaf Area are missing the most data points (about 10-15) while there is little to none missing for the other Sarracenia characteristics observed for the study.")
+gg_miss_var(plant) + labs(caption = "This plot shows the missing data points for the variables in question in the plant data frame. Chlorophyll content, photosynthetic rate, and Spcific Leaf Area are missing the most data points (about 10-15) while there is little to none missing for the other Sarracenia characteristics observed for the study.")
 ```
 
-# Creating a Subset of the dataframe and omitting the NA (missing data values)
+## Creating a Subset of the dataframe and omitting the NA (missing data values)
 
 ```{r subset-drop-NA}
 plant_subset <- plant %>% 
   drop_na(sla, chlorophyll, amass, num_lvs, num_phylls)
 ```
 
-# Create a correlation plot:  
+## Create a correlation plot:  
 
 ```{r correlation-plot}
 # calculate Pearson's r for numerical values only
@@ -95,15 +95,15 @@ corrplot(plant_cor,
   title(sub = "This correlation plot shows that there is a fairly even ditribution of both poswitive and negative linear correlations between the variables in the data subset. The red ovals shows a negative value, meaning there is a negative correlation between the variables in the column & row while the blue ovals are a positive correlation. Diagonally you can see boxes with +1 and a line drawn through them, this is because it is the comparison of the same variables. Boxes with a 0 are variables with no correlation at all.")
 ```
 
-# Create a plot of each variable compared against the others 
+## Create a plot of each variable compared against the others 
 
 ```{r pairs-plot}
 plant_subset %>% 
   select(species:num_phylls) %>% 
-  ggpairs()
+  ggpairs() + labs(caption = "This plot shows the comparison of variables to one another in multiple different plots. The center diagonal plots shows the density plot for each variable. The plots below the diagonals is the scatterplot for each pair of variables. Finally, the plots above the diagonal is the Pearson correlation for each pair of variables.")
 ```
 
-# Starting regression here:  
+## Starting regression here:  
 
 (example) To determine how species and physiological characteristics predict biomass, we fit multiple linear models.
 
@@ -112,7 +112,7 @@ null <- lm(totmass ~ 1, data = plant_subset)
 full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
 ```
 
-# Diagnostics
+## Diagnostics
 
 We visually assess normality and homoskedasticity of residuals using diagnostic plots for the full model:
 
@@ -138,7 +138,7 @@ check_normality(full_log)
 check_heteroscedasticity(full_log)
 ```
 
-Evaluate multicollinearity:
+## Evaluate multicollinearity:
 
 ```{r calculate-vif}
 car::vif(full_log)
@@ -146,19 +146,46 @@ car::vif(full_log)
 
 We evaluated multicollinearity by calculating generalized variance inflation factor and determined that...
 
-Try some more models:
+## Try some more models:
 
 addressing the question: what set of predictor variables best explains the response?
 
-```{r}
-model2_log <- lm(log(totmass) ~ species, data = plant_subset)
+```{r Creating-another-model}
+model_2_log <- lm(log(totmass) ~ species, data = plant_subset)
 ```
 
-check assumptions for model 2:
+```{r Creating-another-model}
+model_3_log <- lm(log(amass)~ species, data = plant_subset)
+```
+
+```{r Creating-another-model}
+model_4_log <- lm(log(num_lvs) ~ species, data = plant_subset)
+```
+
+## Check assumptions for models 2-4:
+
 ```{r}
-plot(model2_log)
+plot(model_2_log)
+# they are clumped in this way because the predictors are categorical, you just want to see an even distribution of normal variables
+
+check_normality(model_2_log)
+check_heteroscedasticity(model_2_log)
+```
+
+```{r}
+plot(model_3_log)
 # they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
 
-check_normality(model2_log)
-check_heteroscedasticity(model2_log)
+check_normality(model_3_log)
+check_heteroscedasticity(model_3_log)
 ```
+
+```{r}
+plot(model_4_log)
+# they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
+
+check_normality(model_4_log)
+check_heteroscedasticity(model_4_log)
+```
+
+## Results
