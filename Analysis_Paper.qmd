@@ -1,0 +1,26 @@
+---
+title: "Analysis Paper"
+author: "Graycen Mahon"
+format: html
+editor: visual
+---
+
+\## Introduction
+
+Also known as pitcher plant, the Sarracenia is a carnivorous plant found in the eastern United States and Canada (Bledzki et al). It has pitcher-like leaves filled with a toxic and corrosive liquid (Bledzki et al). This liquid is what breaks down and allows the plant to consume its prey!According to a study published in the National center for Biotechnology Information, the Sarracenia plant has many ethnobotanical uses such as: treating type II diabetes and tuberculosis (Huang et al). Studies also show this species as a potential treatment for cancer (Huang et al). The current and theorized uses of this plant could be groundbreaking, and therefore have sparked the interest of many scientists and botanists. Furthermore, predicting the biomass through physiological methods (the mass of the fluid in the Sarracenia leaves) is useful in assessing it's potential for prey consumption as well as observing the targeted prey of the species (Bledzki et a). Ecological studies of this species can show population dynamics of common organisms that are prey of the Sarracenia plant and how it affects the environment (Bledzki et al). In this analysis, I am addressing the following question: How do Sarracenia characteristics predict biomass? In order to answer this question, I will test the hypothesis that different Sarracenia characteristics (such as feed level, chlorophyll content, photosynthetic rate, number of leaves as the number of predatory phyllodes) have a positive affect on the plants biomass. Through this analysis of the data, I will either accept or reject this hypothesis and it will be shown through my work.
+For this study, the data was sampled by selected two plants of each of the Sarracenia species and they were then assigned to a specific "feeding level", ranked 1-6. The rankings coincided with the size of the plants, and were therefore given different amounts of feed. Over 7 weeks (on a once a week feeding schedule) the plants were measured for their size as well as photosynthetic rate both prior to and during the treatment.
+
+\## Methods:
+
+In order to organize the data, it first must be read into R studio using the read_csv function. I created a new object called "plant"and stored the data set within this object. After reading in the data, I used the clean_names and select functions in order to make the column titles easier to read & work with in R and reduced the numbers of variables shown in the data set with only the characteristics I am interested in remaining. Afterwards, I created a missing data visualization using the data frame "plant" in order to show the missing data points for each characteristic in question. This shows that out of the 120 observations of Sarracenia plants, there is about 10% of missing data (each) for Chlorophyll content, Photosynthetic rate, and leaf area. Missing data can skew the analysis of a data set, and therefore should be accounted for when looking at and running tests on a data frame. After creating the missing data visualization in order to determine the relationships between numerical variables in our data set, we calculated Pearson r and visually represented correlation using a correlation plot. The plot shows the correlation between different variables, with +1 showing a positive correlation and -1 showing a negative correlation (while 0 is no correlation). In the visualization showing the relationships between the two variables, each graph is plotting different variables against one another. The linear plots down the diagonal show the density relationship for each variable, while the plots on the top row and the leftmost row are plots of each variable with species. The squares above the diagonal are the Pearson correlation values while the plots below the diagonal are scatter plots of a pair of variables compared to one another.
+
+\## Results
+
+Sources:
+
+Bledzki, Leszek A. et al. "Population Growth and Production.." Department of Biological Sciences, Mount Holyoke College, 1998 https://link-springer-com.proxy.library.ucsb.edu/content/pdf/10.1023/A%3A1003566729588.pdf
+
+Ellison, A. and E. Farnsworth. 2021. Effects of Prey Availability on Sarracenia Physiology at Harvard Forest 2005 ver 18. Environmental Data Initiative. https://doi.org/10.6073/pasta/26b22d09279e62fd729ffc35f9ef0174 (Accessed 2023-06-02).
+
+Huang, Yen-Hua et al. "Anticancer and Antioxidant Activities...", National Center for Biotechnology Information, National Library of Medicine, 2022
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9269354/
