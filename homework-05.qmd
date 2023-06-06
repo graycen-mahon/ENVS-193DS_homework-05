@@ -1,5 +1,5 @@
 ---
-title: "homework-05"
+title: "Homework-05"
 author: "Graycen Mahon"
 format: html
 editor: visual
@@ -35,7 +35,6 @@ library(corrplot)
 library(AICcmodavg)
 library(GGally)
 ```
-
 
 ## Reading in the dataset:
 
@@ -86,8 +85,6 @@ plant_subset %>%
 
 ## Starting regression here:  
 
-(example) To determine how species and physiological characteristics predict biomass, we fit multiple linear models.
-
 ```{r null-and-full-models}
 null <- lm(totmass ~ 1, data = plant_subset)
 full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
@@ -95,16 +92,11 @@ full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs +
 
 ## Diagnostics
 
-We visually assess normality and homoskedasticity of residuals using diagnostic plots for the full model:
-
 ```{r full-diagnostics}
 par(mfrow = c(2, 2))
 plot(full)
 ```
 
-We also tested for normality using the Shapiro-Wilk test (null hypothesis: variable of interest (i.e. the residuals) are normally distributed).  
-
-We tested for heteroskedasticity using the Breusch-Pagan test (null hypothesis: variable of interest has constant variance).
 ```{r}
 check_normality(full)
 check_heteroscedasticity(full)
@@ -125,8 +117,6 @@ check_heteroscedasticity(full_log)
 car::vif(full_log)
 ```
 
-We evaluated multicollinearity by calculating generalized variance inflation factor and determined that...
-
 ## Try some more models:
 
 addressing the question: what set of predictor variables best explains the response?
@@ -145,7 +135,7 @@ model_4_log <- lm(log(num_lvs) ~ species, data = plant_subset)
 
 ## Check assumptions for models 2-4:
 
-```{r}
+```{r totmass}
 plot(model_2_log)
 # they are clumped in this way because the predictors are categorical, you just want to see an even distribution of normal variables
 
@@ -153,7 +143,7 @@ check_normality(model_2_log)
 check_heteroscedasticity(model_2_log)
 ```
 
-```{r}
+```{r photosynthetic-rate}
 plot(model_3_log)
 # they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
 
@@ -161,11 +151,15 @@ check_normality(model_3_log)
 check_heteroscedasticity(model_3_log)
 ```
 
-```{r}
+```{r number-of-leaves}
 plot(model_4_log)
-# they are clumped in this way becuase the predictors are categorical, you just want to see an even distribution of normal variables
+# they are clumped in this way because the predictors are categorical, you just want to see an even distribution of normal variables
 
 check_normality(model_4_log)
 check_heteroscedasticity(model_4_log)
+```
+
+```{r model-comparisons}
+
 ```
 
