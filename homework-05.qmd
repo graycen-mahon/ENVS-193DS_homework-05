@@ -1,25 +1,32 @@
 ---
 title: "Homework-05"
 author: "Graycen Mahon"
-format: html
-editor: visual
+date: "2023-06-05"
+output:
+    html_document:
+      code_folding: hide
 ---
+
+Link to my GitHub Repo: https://github.com/graycen-mahon/ENVS-193DS_homework-05.git 
 
 ## knitr set up options for an RMarkdown document:
 
 ```{r knitr-example, eval = FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+# suppress any messages from R using the code chunk above, setting messages and warnings to false
 ```
 
 ## Organize Packages using the here package
 
 ```{r file-organization}
 here::here("Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05")
+# organizing my files using the here package
 ```
 
 ## Set up
 
 ```{r packages!}
+# loading in important packages!
 # should haves (from last week)
 library(tidyverse)
 library(here)
@@ -49,7 +56,8 @@ select(totmass, species, feedlevel, sla, chlorophyll, amass, num_lvs, num_phylls
 ## Visualize the missing data:
 
 ```{r missing-data-visualization}
-gg_miss_var(plant) + labs(caption = "This plot shows the missing data points for the variables in question in the plant data frame. Chlorophyll content, photosynthetic rate, and Spcific Leaf Area are missing the most data points (about 10-15) while there is little to none missing for the other Sarracenia characteristics observed for the study.")
+gg_miss_var(plant) + labs(caption = str_wrap("This plot shows the missing data points for the variables in question in the plant data frame. Chlorophyll content, photosynthetic rate, and Spcific Leaf Area are missing the most data points (about 10-15) while there is little to none missing for the other Sarracenia characteristics observed for the study.", width = 150))
+# create a missing data visualization with an accompanying caption to explain the graph. 
 ```
 
 ## Creating a Subset of the dataframe and omitting the NA (missing data values)
@@ -57,15 +65,17 @@ gg_miss_var(plant) + labs(caption = "This plot shows the missing data points for
 ```{r subset-drop-NA}
 plant_subset <- plant %>% 
   drop_na(sla, chlorophyll, amass, num_lvs, num_phylls)
+# create a plant subset that is essentially the data frame we want without any NA values that would affect the data analysis
 ```
 
 ## Create a correlation plot:  
 
 ```{r correlation-plot}
-# calculate Pearson's r for numerical values only
+# calculate Pearson's r for numerical values only 
 plant_cor <- plant_subset %>% 
   select(feedlevel:num_phylls) %>% 
   cor(method = "pearson")
+# select the numerical data by setting the range of columns wanted from feedlevel to number of phyllodes using a colon
   
 # creating a correlation plot
 corrplot(plant_cor,
@@ -80,7 +90,9 @@ corrplot(plant_cor,
 ```{r pairs-plot}
 plant_subset %>% 
   select(species:num_phylls) %>% 
-  ggpairs() + labs(caption = "This plot shows the comparison of variables to one another in multiple different plots. The center diagonal plots shows the density plot for each variable. The plots below the diagonals is the scatterplot for each pair of variables. Finally, the plots above the diagonal is the Pearson correlation for each pair of variables.")
+  ggpairs() + labs(caption = str_wrap("This plot shows the comparison of variables to one another in multiple different plots. The center diagonal plots shows the density plot for each variable. The plots below the diagonals is the scatterplot for each pair of variables. Finally, the plots above the diagonal is the Pearson correlation for each pair of variables.", width = 150))
+# using the plant subset data frame, select the columns of interest as we did above and using the pipe create a gg plot of the variables in comparison to one another, with an accopanying caption. 
+
 ```
 
 ## Starting regression here:  
@@ -88,6 +100,7 @@ plant_subset %>%
 ```{r null-and-full-models}
 null <- lm(totmass ~ 1, data = plant_subset)
 full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs + num_phylls, data = plant_subset)
+# create a null and full model as the base of the analysis. The first with only the total mass variable and the second being the correlation between total mass and the other predictor variables in question. 
 ```
 
 ## Diagnostics
@@ -95,12 +108,17 @@ full <- lm(totmass ~ species + feedlevel + sla + chlorophyll + amass + num_lvs +
 ```{r full-diagnostics}
 par(mfrow = c(2, 2))
 plot(full)
+# then, plot the full model in order to see the QQ plot, residuals, as well as the scale location. 
 ```
 
 ```{r}
 check_normality(full)
 check_heteroscedasticity(full)
+# run two tests on the plot/full model in order to check for normality and heteroscadasticity. 
+# non-normal distribution and heteroscadasticity detected
 ```
+
+##  Using a logarithm to create full and null models
 
 ```{r}
 null_log <- lm(log(totmass) ~ 1, data = plant_subset)
@@ -109,6 +127,8 @@ full_log <- lm(log(totmass) ~ species + feedlevel + sla + chlorophyll + amass + 
 plot(full_log)
 check_normality(full_log)
 check_heteroscedasticity(full_log)
+# using a logarithm to make and plot the models will make it more likely to have a better normal distribution and homoscedasticity. 
+# normal distribution and homoscedasticity detected
 ```
 
 ## Evaluate multicollinearity:
@@ -119,21 +139,17 @@ car::vif(full_log)
 
 ## Try some more models:
 
-addressing the question: what set of predictor variables best explains the response?
+(addressing the question: What set of predictor variables best explains the response?)
 
-```{r Creating-another-model}
+## Create and Check assumptions: log models 2-4
+
+```{r Creating-log-models}
 model_2_log <- lm(log(totmass) ~ species, data = plant_subset)
-```
 
-```{r Creating-another-model}
-model_3_log <- lm(log(amass)~ species, data = plant_subset)
-```
+model_3_log <- lm(log(amass) ~ species, data = plant_subset)
 
-```{r Creating-another-model}
 model_4_log <- lm(log(num_lvs) ~ species, data = plant_subset)
 ```
-
-## Check assumptions for models 2-4:
 
 ```{r totmass}
 plot(model_2_log)
@@ -141,6 +157,8 @@ plot(model_2_log)
 
 check_normality(model_2_log)
 check_heteroscedasticity(model_2_log)
+# normal distribution and homoscedasticity detected
+
 ```
 
 ```{r photosynthetic-rate}
@@ -149,6 +167,7 @@ plot(model_3_log)
 
 check_normality(model_3_log)
 check_heteroscedasticity(model_3_log)
+# non-normal distribution and heteroscadasticity detected
 ```
 
 ```{r number-of-leaves}
@@ -157,9 +176,67 @@ plot(model_4_log)
 
 check_normality(model_4_log)
 check_heteroscedasticity(model_4_log)
+# normal distribution and homoscedasticity detected
 ```
 
-```{r model-comparisons}
+## Model Comparisons: 
 
+compare models. using Akaike's information criterion (AIC) values
+
+```{r}
+AICc(full_log)
+AICc(model_2_log)
+AICc(null_log) 
+AICc(model_3_log)
+AICc(model_4_log)
+
+MuMIn::AICc(full_log, model_2_log, null_log, model_3_log, model_4_log)
+MuMIn::model.sel(full_log, model_2_log, null_log, model_3_log, model_4_log)
 ```
 
+# Results
+
+```{r}
+summary(model_4_log)
+table <- tidy(model_4_log, conf.int = TRUE, exponentiate = TRUE) %>%
+  mutate_if(is.numeric, round, 3) %>% 
+  # using mutate, I rounded each value to have 3 decimal places
+  # make it into a flextable using the flextable function 
+  flextable() %>% 
+  # fit it to the viewer using autofit!
+  autofit()
+
+table
+```
+
+## Use gg predict to back transform estimates:
+
+```{r}
+model_pred <- ggpredict(model_4_log, terms = "species", back.transform = TRUE)
+
+plot(ggpredict(model_4_log, terms = "species", back.transform = TRUE), add.data = TRUE) + labs(caption = str_wrap("This table shows the predictor variable (Number of Leaves) in comparison to the species in relation to biomass. The dots are for each observation and the lines represent the confidence intervals.", width = 140))
+
+model_pred
+```
+
+## Introduction
+
+Also known as pitcher plant, the Sarracenia is a carnivorous plant found in the eastern United States and Canada (Bledzki et al). It has pitcher-like leaves filled with a toxic and corrosive liquid (Bledzki et al). This liquid is what breaks down and allows the plant to consume its prey! According to a study published in the National center for Biotechnology Information, the Sarracenia plant has many ethno-botanical uses such as: treating type II diabetes and tuberculosis (Huang et al). Studies also show this species as a potential treatment for cancer (Huang et al). The current and theorized uses of this plant could be groundbreaking, and therefore have sparked the interest of many scientists and botanists. Furthermore, predicting the biomass through physiological methods (the mass of the fluid in the Sarracenia leaves) is useful in assessing it's potential for prey consumption as well as observing the targeted prey of the species (Bledzki et a). Ecological studies of this species can show population dynamics of common organisms that are prey of the Sarracenia plant and how it affects the environment (Bledzki et al). In this analysis, I am addressing the following question: How do Sarracenia characteristics predict biomass? In order to answer this question, I will test the hypothesis that different Sarracenia characteristics (such as feed level, chlorophyll content, photosynthetic rate, number of leaves as the number of predatory phyllodes) have a positive affect on the plants biomass. Through this analysis of the data, I will either accept or reject this hypothesis and it will be shown through my work.
+For this study, the data was sampled by selected two plants of each of the Sarracenia species and they were then assigned to a specific "feeding level", ranked 1-6. The rankings coincided with the size of the plants, and were therefore given different amounts of feed. Over 7 weeks (on a once a week feeding schedule) the plants were measured for their size as well as photosynthetic rate both prior to and during the treatment.
+
+## Methods:
+
+In order to organize the data, it first must be read into R studio using the read_csv function. I created a new object called "plant"and stored the data set within this object. After reading in the data, I used the clean_names and select functions in order to make the column titles easier to read & work with in R and reduced the numbers of variables shown in the data set with only the characteristics I am interested in remaining. Afterwards, I created a missing data visualization using the data frame "plant" in order to show the missing data points for each characteristic in question. This shows that out of the 120 observations of Sarracenia plants, there is about 10% of missing data (each) for Chlorophyll content, Photosynthetic rate, and leaf area. Missing data can skew the analysis of a data set, and therefore should be accounted for when looking at and running tests on a data frame. After creating the missing data visualization in order to determine the relationships between numerical variables in our data set, we calculated Pearson r and visually represented correlation using a correlation plot. The plot shows the correlation between different variables, with +1 showing a positive correlation and -1 showing a negative correlation (while 0 is no correlation). In the visualization showing the relationships between the two variables, each graph is plotting different variables against one another. The linear plots down the diagonal show the density relationship for each variable, while the plots on the top row and the leftmost row are plots of each variable with species. The squares above the diagonal are the Pearson correlation values while the plots below the diagonal are scatter plots of a pair of variables compared to one another. After creating the visualization plot, I made a null model as well as a full model. The null model is used to show the prediction that there is no effect of the variables on the data set while the full model shows the effect of each variable on the data set. After creating the models, I visually assess normality and homoskedasticity of residuals using diagnostic plots for the full model: I also tested for normality using the Shapiro-Wilk test (null hypothesis: variable of interest are normally distributed). We tested for heteroskedasticity using the Breusch-Pagan test (null hypothesis: variable of interest has constant variance). However, aftering running both these tests, I discovered that for the full model, there is a non normal distribution of residuals detected as well as heteroscedasticity (a non-constant error variance). Afterwards, I decided to make a logarithmic model of both the full and null model. Using the logarithm of one or more variables improved the fit of the model by transforming the distribution of the features to a more normally-shaped bell curve. This transformation allows for simpler statistical analysis and a better understanding of the data. After analyzing the full model I then created three more models with three different predictor variables. For my other three models, I chose the variables total mass, photosynthetic rate, and the number of leaves on the Sarracenia plants. I chose total mass first because I believe that it has a strong relationship with biomass potential. Sarracenia plants attract, trap, and consume different insects using their pitcher-like stems. Prey availability, or the lack thereof, may have an effect on the mass of the plant. Secondly, I chose photosynthetic rate as the second predictor variable because prey availability may have drastic effect on the rate of photosynthesis (amass) through access to nutrients that are extracted from the insects consumed. Amass is driven by the plants ability to maintain nutrient levels as well as access to food. Lastly, I chose number of leaves as the last variable because of it's effect on plant size. more leaves is indicative of more nutrients, which is caused by a large amount of prey availability. Next, we evaluated multicollinearity by calculating generalized variance inflation factor and determined that, for the full model, all the variables have a GVIF value that's greater than 1. This means that the variables are moderately coordinated in this data set which therefore leads to the conclusion that as one variable changes, the other variables are altered as well. 
+  
+## Results
+
+The best model shown from this analysis is the model containing the predictor variable "num_lvs" (number of leaves) for the Sarracenia plant. It was chosen based on the AICc values, which showed that the 4th model model has the lowest value. Therefore is the best predictor of total biomass is the number of leaves on the Sarracenia plant. Model 4, henceforth known as the Leaves Model, was checked for both normality of distribution and homoscedastic errors, which we found evidence of both. The residuals vs fitted plot shows that there is a linear relationship between the dependent and independent variables There is no true pattern of the points, they are randomly distributed on the plot. Secondly, the QQ plot shows that the data set follows a mostly normal distribution. Towards the end of the graph the data points veer off the dotted line, but the majority of the data indicates a normal distribution. In the third plot (Scale-location), testing for the ratio of variance, we can see that due to the data points being pretty evenly distributed along the fairly straight red line, that the data set is indeed homeoscedastic. Lastly, the final plot (Residuals vs Leverage) is a plot that shows which, and how many, points in a data set are considered influential. If any point in this plot falls outside of Cook's distance (the grey dashed lines on the graph) then it is considered to be an influential observation and if removed from the data set, the coefficients would change drastically. This specifc plot shows that there are very few influential points in the data set, with most of the points falling within the dotted lines. As the data is normally distributed, it rises and falls in a bell curve meaning that at some point the biomass of the plant decreases, even though there are many leaves. However, biologically, this models tells me that as the number of leaves increases for a Sarracenia plant, its biomass also increases. This is true across all species of Sarracenia included in the study. 
+
+## Sources:
+
+Bledzki, Leszek A. et al. "Population Growth and Production.." Department of Biological Sciences, Mount Holyoke College, 1998 https://link-springer-com.proxy.library.ucsb.edu/content/pdf/10.1023/A%3A1003566729588.pdf
+
+Ellison, A. and E. Farnsworth. 2021. Effects of Prey Availability on Sarracenia Physiology at Harvard Forest 2005 ver 18. Environmental Data Initiative. https://doi.org/10.6073/pasta/26b22d09279e62fd729ffc35f9ef0174 (Accessed 2023-06-02).
+
+Huang, Yen-Hua et al. "Anticancer and Antioxidant Activities...", National Center for Biotechnology Information, National Library of Medicine, 2022
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9269354/
