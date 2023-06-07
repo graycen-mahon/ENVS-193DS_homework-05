@@ -2,4 +2,18 @@ project:
   type: website
   output-dir: docs
 
-
+website: 
+  title: "mysite"
+  navbar: 
+  left:
+    - href: index.qmd
+    text: Home
+    - about.qmd
+  
+format:
+  html:
+    theme: cosmo
+    style: style.css
+    toc: true
+  
+  
