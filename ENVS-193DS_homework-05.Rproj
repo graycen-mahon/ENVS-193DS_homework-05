@@ -11,3 +11,6 @@ Encoding: UTF-8
 
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
+
+BuildType: Website
+WebsitePath: /Users/graycenmahon/Downloads/GitHub/ENVS-193DS_homework-05/mysite
